@@ -6,7 +6,7 @@ import os
 pygame.init()
 LARGEUR, HAUTEUR = 1024, 576
 ecran = pygame.display.set_mode((LARGEUR, HAUTEUR))
-pygame.display.set_caption("ELDEN PY: BOSS FINAL")
+pygame.display.set_caption("ELDEN PY: BOSS FINAL (Version Grand Ecran)")
 horloge = pygame.time.Clock()
 
 BOSS_REGARDE_DROITE = True
@@ -24,7 +24,6 @@ FOND_ENDURANCE = (20, 60, 20)
 COULEUR_INCANTATION = (255, 140, 0)
 
 # --- CORRECTION CHEMIN ---
-# Cette ligne permet de trouver le dossier du jeu quel que soit l'ordinateur
 chemin_base = os.path.dirname(os.path.abspath(__file__))
 
 MUSIC_MENU = os.path.join(chemin_base, "Firelink Shrine - Dark Souls Soundtrack 03.mp3")
@@ -509,6 +508,8 @@ class Boss:
         self.chrono_resurrection = 0
         self.delai_technique = 200
         
+        self.chrono_prepa_technique = 0
+        
         self.disciple = Disciple(self)
 
     def lancer_transition_phase2(self):
@@ -534,6 +535,7 @@ class Boss:
                         self.a_tire = False
                         
             elif self.etat == "attaque":
+                # Utiliser frames_attaque pour l'attaque ou frames_final si Phase 2
                 frames = self.frames_final if self.phase == 2 else self.frames_attaque
                 if self.index_image >= len(frames):
                     self.etat = "repos"
@@ -547,6 +549,7 @@ class Boss:
         corps_a_corps = False
         nouveau_monstre = None
         
+        # Le disciple vit sa vie indépendamment du Boss en phase 2
         if self.phase == 2:
             nouveau_monstre = self.disciple.mettre_a_jour()
             self.delai_technique -= 1
@@ -571,6 +574,7 @@ class Boss:
         if self.recuperation > 0: self.recuperation -= 1
         if self.chrono_flash > 0: self.chrono_flash -= 1
         
+        # Le Boss fait ses actions s'il n'est pas déjà occupé
         if self.etat in ["repos", "poursuite"]:
             self.chrono_tir += 1
             if self.chrono_tir > self.freq_tir and dist > 150:
@@ -781,7 +785,9 @@ def main():
 
             elif etat == "MENU_DIFFICULTE":
                 if evenement.type == pygame.KEYDOWN:
-                    if evenement.key == pygame.K_1: difficulte_choisie = "noob"
+                    if evenement.key == pygame.K_ESCAPE:
+                        etat = "MENU_GENRE"
+                    elif evenement.key == pygame.K_1: difficulte_choisie = "noob"
                     elif evenement.key == pygame.K_2: difficulte_choisie = "normal"
                     elif evenement.key == pygame.K_3: difficulte_choisie = "pro"
                     if evenement.key in [pygame.K_1, pygame.K_2, pygame.K_3]:
@@ -791,8 +797,16 @@ def main():
                         jouer_musique(MUSIC_PHASE1, volume_general)
             elif etat == "JEU":
                 if (jeu_fini or victoire) and evenement.type == pygame.KEYDOWN and evenement.key == pygame.K_RETURN:
-                    main()
-                    return
+                    etat = "INTRODUCTION"
+                    joueur = None
+                    boss = None
+                    particules = []
+                    effets_sang = []
+                    attaques_sol = []
+                    secousse = 0
+                    jeu_fini = False
+                    victoire = False
+                    jouer_musique(MUSIC_MENU, volume_general)
 
         ecran.fill(NOIR)
 
@@ -824,6 +838,7 @@ def main():
             dessiner_texte_centre(ecran, "[1] ECUYER (Facile)", 200, 30, VERT_ENDURANCE)
             dessiner_texte_centre(ecran, "[2] CHEVALIER (Normal)", 250, 30, ARGENT)
             dessiner_texte_centre(ecran, "[3] LEGENDE (Difficile)", 300, 30, ROUGE_SANG)
+            dessiner_texte_centre(ecran, "ECHAP : RETOUR", 500, 25, ROUGE_SANG)
 
         elif etat == "JEU":
             surface_jeu = pygame.Surface((LARGEUR, HAUTEUR))
@@ -928,7 +943,7 @@ def main():
             if jeu_fini:
                 dessiner_texte_centre(surface_jeu, "VOUS ETES MORT (ENTREE)", 200, 60, ROUGE_SANG)
             if victoire:
-                dessiner_texte_centre(surface_jeu, "ARCHIMAGE DU NÉANT ABATTU (ENTREE)", 200, 45, OR) # Taille 45 pour que ça rentre
+                dessiner_texte_centre(surface_jeu, "ARCHIMAGE DU NEANT ABATTU (ENTREE)", 200, 45, OR)
 
             ecran.blit(surface_jeu, (decale, decale))
 
