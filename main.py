@@ -23,7 +23,9 @@ VERT_ENDURANCE = (40, 180, 80)
 FOND_ENDURANCE = (20, 60, 20)
 COULEUR_INCANTATION = (255, 140, 0)
 
-chemin_base = r"C:\Users\adiya\Desktop\JEU PY"
+# --- CORRECTION CHEMIN ---
+# Cette ligne permet de trouver le dossier du jeu quel que soit l'ordinateur
+chemin_base = os.path.dirname(os.path.abspath(__file__))
 
 MUSIC_MENU = os.path.join(chemin_base, "Firelink Shrine - Dark Souls Soundtrack 03.mp3")
 MUSIC_PHASE1 = os.path.join(chemin_base, "Taurus Demon - Dark Souls Soundtrack 04.mp3")
@@ -545,7 +547,6 @@ class Boss:
         corps_a_corps = False
         nouveau_monstre = None
         
-        # Le disciple vit sa vie indépendamment du Boss en phase 2
         if self.phase == 2:
             nouveau_monstre = self.disciple.mettre_a_jour()
             self.delai_technique -= 1
@@ -570,7 +571,6 @@ class Boss:
         if self.recuperation > 0: self.recuperation -= 1
         if self.chrono_flash > 0: self.chrono_flash -= 1
         
-        # Le Boss fait ses actions s'il n'est pas déjà occupé
         if self.etat in ["repos", "poursuite"]:
             self.chrono_tir += 1
             if self.chrono_tir > self.freq_tir and dist > 150:
@@ -705,7 +705,7 @@ def dessiner_hud(surface, joueur, boss):
             surface.blit(IMG_UI_BOSS, (rect_x, rect_y), area=pygame.Rect(0, 0, largeur_boss, 15))
         pygame.draw.rect(surface, OR, (rect_x, rect_y, 600, 15), 2)
         
-        nom = "SORCIER DU FLEAU" if boss.phase == 1 else "ARCHIMAGE DU NÉANT"
+        nom = "SORCIER DU FLEAU" if boss.phase == 1 else "ARCHIMAGE DU NEANT"
         couleur = ARGENT if boss.phase == 1 else ROUGE_SANG
         police = obtenir_police(18)
         surface.blit(police.render(nom, True, couleur), (rect_x + 5, rect_y - 22))
@@ -928,7 +928,7 @@ def main():
             if jeu_fini:
                 dessiner_texte_centre(surface_jeu, "VOUS ETES MORT (ENTREE)", 200, 60, ROUGE_SANG)
             if victoire:
-                dessiner_texte_centre(surface_jeu, "SORCIER ABATTU(ENTREE)", 200, 60, OR)
+                dessiner_texte_centre(surface_jeu, "ARCHIMAGE DU NÉANT ABATTU (ENTREE)", 200, 45, OR) # Taille 45 pour que ça rentre
 
             ecran.blit(surface_jeu, (decale, decale))
 
