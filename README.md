@@ -1,6 +1,6 @@
 PROJET FINAL : ELDEN PY - BOSS RUSH
 -----------------------------------
-Auteur : [TON NOM ICI]
+Auteur : Agin Ryan 
 Langage : Python 3
 Bibliothèque : Pygame
 
